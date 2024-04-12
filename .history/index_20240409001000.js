@@ -1,0 +1,151 @@
+const { Client } = require("pg");
+var express = require("express");
+var app = express();
+
+const cors = require("cors");
+app.use(cors());
+
+var bodyParser = require("body-parser");
+
+const { Sequelize } = require("sequelize");
+
+// const mangrove43 = require('mangrove_43.json');
+
+const fs = require("fs");
+
+app.use(bodyParser.json({ type: "application/json" }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+const sequelize = new Sequelize("doi_geo", "geo_service", "M@h0lan!Geo", {
+  host: "10.10.10.112",
+  dialect: "postgres",
+});
+
+async function connectDB() {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection has been established successfully.");
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+}
+connectDB();
+
+// const client = new Client({
+//   host: 'localhost',
+//   port: 5432,
+//   user: 'postgres',
+//   password: 'fernkus42',
+//   database: 'postgis_30_sample',
+// });
+// client.connect();
+
+var server = app.listen(1348, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+  console.log("start");
+});
+
+app.get("/geo_basemap_get", async (req, res) => {
+  const [results, metadata] = await sequelize.query(
+    "select * from geo_basemap"
+  );
+  res.json(results);
+});
+
+app.post("/geo_basemap", async (req, res) => {
+  const {
+    basemap_id,
+    title_th,
+    title_en,
+    uri,
+    tiles,
+    glyphs,
+    is_public,
+    updated_by,
+    update_at,
+    delete_by,
+    delete_at,
+    create_by,
+    create_at,
+    is_active,
+  } = req.body;
+  try {
+    // Insert the record if the vector_id does not exist
+    await sequelize.query(
+      "INSERT INTO geo_basemap (basemap_id,title_th,title_en,uri,tiles,glyphs,is_public,updated_by,update_at,delete_by,delete_at,create_by,create_at,is_active,) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9,$10,$11,$12,$13,$14)",
+      {
+        bind: [
+          basemap_id,
+          title_th,
+          title_en,
+          uri,
+          tiles,
+          glyphs,
+          is_public,
+          updated_by,
+          update_at,
+          delete_by,
+          delete_at,
+          create_by,
+          create_at,
+          is_active,
+        ],
+      }
+    );
+    res.status(201).json({ message: "saved successfully" });
+  } catch (error) {
+    console.error("Error saving data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// app.post("/geo_vector", async (req, res) => {
+//   const {
+//     geom,
+//     vector_id,
+//     layer_id,
+//     layer_name,
+//     source,
+//     source_id,
+//     vector_type_id,
+//     map_id,
+//     is_active,
+//   } = req.body;
+//   try {
+//     // Check if the vector_id already exists in the database
+//     const existingVector = await sequelize.query(
+//       "SELECT * FROM geo_basemap WHERE vector_id = $1 AND vector_type_id = $2",
+//       {
+//         bind: [vector_id, vector_type_id],
+//         type: sequelize.QueryTypes.SELECT,
+//       }
+//     );
+
+//     if (existingVector.length > 0) {
+//       return res.status(400).json({ message: "Vector ID already exists" });
+//     }
+
+//     // Insert the record if the vector_id does not exist
+//     await sequelize.query(
+//       "INSERT INTO geo_basemap (geom, vector_id, layer_id, layer_name, source, source_id, vector_type_id, map_id, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+//       {
+//         bind: [
+//           geom,
+//           vector_id,
+//           layer_id,
+//           layer_name,
+//           source,
+//           source_id,
+//           vector_type_id,
+//           map_id,
+//           is_active,
+//         ],
+//       }
+//     );
+//     res.status(201).json({ message: "GeoJSON data saved successfully" });
+//   } catch (error) {
+//     console.error("Error saving GeoJSON data:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });

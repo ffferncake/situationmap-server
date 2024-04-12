@@ -194,16 +194,16 @@ app.post("/geo_map", async (req, res) => {
   } = req.body;
 
   try {
+
     await sequelize.query(
-      "INSERT INTO geo_map (map_id,name,description,basemap_id,center,zoom_level,pitch,bearing,is_lock,thumbnail_id,is_public,update_by,update_at,delete_by,delete_at,create_by,create_at,is_active) VALUES ($1, $2, $3, $4, POINT($5, $6), $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+      "INSERT INTO geo_map (map_id,name,description,basemap_id,center,zoom_level,pitch,bearing,is_lock,thumbnail_id,is_public,update_by,update_at,delete_by,delete_at,create_by,create_at,is_active) VALUES ($1, $2, $3, $4, point($5), $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
       {
         bind: [
           map_id,
           name,
           description,
           basemap_id,
-          parseFloat(center.split(" ")[0]), // longitude
-          parseFloat(center.split(" ")[1]), // latitude
+          center,
           zoom_level,
           pitch,
           bearing,

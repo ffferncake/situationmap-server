@@ -84,10 +84,9 @@ app.post("/geo_basemap", async (req, res) => {
     if (existingBasemap.length > 0) {
       // Update the existing record
       await sequelize.query(
-        "UPDATE geo_basemap SET title_th = $2, title_en = $3, uri = $4, tiles = $5, glyphs = $6, is_public = $7, update_by = $8, update_at = $9, delete_by = $10, delete_at = $11, create_by = $12, create_at = $13, is_active = $14 WHERE basemap_id = $1",
+        "UPDATE geo_basemap SET title_th = $1, title_en = $2, uri = $3, tiles = $4, glyphs = $5, is_public = $6, update_by = $7, update_at = $8, delete_by = $9, delete_at = $10, create_by = $11, create_at = $12, is_active = $13 WHERE basemap_id = $14",
         {
           bind: [
-            basemap_id,
             title_th,
             title_en,
             uri,
@@ -101,10 +100,10 @@ app.post("/geo_basemap", async (req, res) => {
             create_by,
             create_at,
             is_active,
+            basemap_id,
           ],
         }
       );
-
       res.status(200).json({ message: "Updated successfully" });
     } else {
       // Insert a new record
@@ -192,18 +191,16 @@ app.post("/geo_map", async (req, res) => {
     create_at,
     is_active,
   } = req.body;
-
   try {
     await sequelize.query(
-      "INSERT INTO geo_map (map_id,name,description,basemap_id,center,zoom_level,pitch,bearing,is_lock,thumbnail_id,is_public,update_by,update_at,delete_by,delete_at,create_by,create_at,is_active) VALUES ($1, $2, $3, $4, POINT($5, $6), $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+      "INSERT INTO geo_map (map_id,name,description,basemap_id,center,zoom_level,pitch ,bearing ,is_lock,thumbnail_id,is_public,update_by,update_at,delete_by,delete_at,create_by,create_at,is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
       {
         bind: [
           map_id,
           name,
           description,
           basemap_id,
-          parseFloat(center.split(" ")[0]), // longitude
-          parseFloat(center.split(" ")[1]), // latitude
+          center,
           zoom_level,
           pitch,
           bearing,
@@ -220,8 +217,7 @@ app.post("/geo_map", async (req, res) => {
         ],
       }
     );
-
-    res.status(201).json({ message: "Saved successfully" });
+    res.status(201).json({ message: "saved successfully" });
   } catch (error) {
     console.error("Error saving data:", error);
     res.status(500).json({ message: "Internal server error" });

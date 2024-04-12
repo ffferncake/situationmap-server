@@ -104,7 +104,6 @@ app.post("/geo_basemap", async (req, res) => {
           ],
         }
       );
-
       res.status(200).json({ message: "Updated successfully" });
     } else {
       // Insert a new record
@@ -175,7 +174,7 @@ app.post("/geo_map", async (req, res) => {
   const {
     map_id,
     name,
-    description,
+    desc,
     basemap_id,
     center,
     zoom_level,
@@ -194,16 +193,16 @@ app.post("/geo_map", async (req, res) => {
   } = req.body;
 
   try {
+    // Assuming center is a string containing the POINT data
     await sequelize.query(
-      "INSERT INTO geo_map (map_id,name,description,basemap_id,center,zoom_level,pitch,bearing,is_lock,thumbnail_id,is_public,update_by,update_at,delete_by,delete_at,create_by,create_at,is_active) VALUES ($1, $2, $3, $4, POINT($5, $6), $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+      "INSERT INTO geo_map (map_id,name,description,basemap_id,center,zoom_level,pitch,bearing,is_lock,thumbnail_id,is_public,update_by,update_at,delete_by,delete_at,create_by,create_at,is_active) VALUES ($1, $2, $3, $4, ST_GeomFromText($5), $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
       {
         bind: [
           map_id,
           name,
-          description,
+          desc,
           basemap_id,
-          parseFloat(center.split(" ")[0]), // longitude
-          parseFloat(center.split(" ")[1]), // latitude
+          center,
           zoom_level,
           pitch,
           bearing,
