@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { sequelize } = require("./db");
-const { QueryTypes } = require("sequelize");
 
 const app = express();
 app.use(bodyParser.json({ type: "application/json" }));
@@ -24,25 +23,6 @@ app.get("/geo_vector_get", async (req, res) => {
   res.json(results);
 });
 
-// http://localhost:1348/geo_map_vector_get/?map_id=c27f255a-5277-4eb5-9874-2c0fd00ec3f7
-// app.get("/geo_map_vector_get", async (req, res) => {
-//   const mapId = req.query.map_id;
-
-//   if (!mapId) {
-//     return res.status(400).json({ error: "map_id parameter is required" });
-//   }
-
-//   const [results, metadata] = await sequelize.query(
-//     "SELECT * FROM geo_map_vector WHERE map_id = :mapId",
-//     {
-//       replacements: { mapId },
-//       type: sequelize.QueryTypes.SELECT,
-//     }
-//   );
-
-//   res.json(results);
-// });
-
 app.get("/geo_map_vector_get", async (req, res) => {
   const mapId = req.query.map_id;
 
@@ -50,21 +30,18 @@ app.get("/geo_map_vector_get", async (req, res) => {
     return res.status(400).json({ error: "map_id parameter is required" });
   }
 
-  const query = `
-    SELECT * 
-    FROM geo_map_vector
-    JOIN geo_vector ON geo_map_vector.vector_id = geo_vector.vector_id
-    WHERE geo_map_vector.map_id = :mapId
-  `;
-
-  const [results, metadata] = await sequelize.query(query, {
-    replacements: { mapId },
-    type: sequelize.QueryTypes.SELECT,
-  });
+  const [results, metadata] = await sequelize.query(
+    "SELECT * FROM geo_map_vector WHERE map_id = :mapId",
+    {
+      replacements: { mapId },
+      type: sequelize.QueryTypes.SELECT,
+    }
+  );
 
   res.json(results);
 });
 
+const { QueryTypes } = require("sequelize");
 
 app.get("/geo_basemap_get", async (req, res) => {
   try {
