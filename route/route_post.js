@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { sequelize } = require("./db");
+const { sequelize } = require("../db");
 
 const app = express();
 app.use(bodyParser.json({ type: "application/json" }));

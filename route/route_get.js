@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { sequelize } = require("./db");
+const { sequelize } = require("../db");
 const { QueryTypes } = require("sequelize");
 
 const app = express();
